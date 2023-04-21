@@ -26,7 +26,3 @@ for files in dbutils.fs.ls('/databricks-datasets/COVID'):
 
 # Obtendo ajuda sobre dbutils
 dbutils.fs.help('ls')
-
-# COMMAND ----------
-
-

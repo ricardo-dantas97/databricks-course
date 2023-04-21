@@ -10,6 +10,7 @@
 # COMMAND ----------
 
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType
+from pyspark.sql.functions import current_timestamp, col
 
 # COMMAND ----------
 
@@ -17,7 +18,6 @@ storage_account_name = 'rddatabricks'
 
 # COMMAND ----------
 
-# Pattern = column name, data type, nullable
 df_schema = StructType(
     fields=[
         StructField("circuitId", IntegerType(), False),
@@ -34,7 +34,6 @@ df_schema = StructType(
 
 # COMMAND ----------
 
-# Read the data again using our schema
 df = spark.read \
     .option('header', 'true') \
     .schema(df_schema) \
@@ -47,7 +46,6 @@ df = spark.read \
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
 df = df.select(
     col("circuitId").alias("circuit_id"),
     col("circuitRef").alias("circuit_ref"),
@@ -66,7 +64,6 @@ df = df.select(
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp
 df = df.withColumn("ingestion_date", current_timestamp())
 
 # COMMAND ----------

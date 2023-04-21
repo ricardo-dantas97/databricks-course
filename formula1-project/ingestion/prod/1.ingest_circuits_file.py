@@ -77,8 +77,3 @@ df = df.withColumn("ingestion_date", current_timestamp())
 # COMMAND ----------
 
 df.write.mode('overwrite').parquet(f"/mnt/{storage_account_name}/processed/circuits")
-
-# COMMAND ----------
-
-# MAGIC %fs
-# MAGIC ls /mnt/rddatabricks/processed/circuits

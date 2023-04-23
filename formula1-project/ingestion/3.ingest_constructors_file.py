@@ -9,7 +9,24 @@
 
 # COMMAND ----------
 
-data_lake = 'rddatabricks'
+# MAGIC %run "../utils/common_functions"
+
+# COMMAND ----------
+
+# MAGIC %run "../utils/configs"
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Creating parameter for data source column
+
+# COMMAND ----------
+
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+data_source = dbutils.widgets.get('p_data_source')
 
 # COMMAND ----------
 
@@ -26,7 +43,7 @@ df_schema = """
 
 df = spark.read \
     .schema(df_schema) \
-    .json(f'/mnt/{data_lake}/raw/constructors.json')
+    .json(f'{raw_folder_path}/constructors.json')
 
 # COMMAND ----------
 
@@ -51,8 +68,9 @@ df = df.drop('url')
 # COMMAND ----------
 
 df = df.withColumnRenamed('constructorId', 'constructior_id') \
-       .withColumnRenamed('constructorRef', 'constructor_ref') \
-       .withColumn('ingestion_date', current_timestamp())
+       .withColumnRenamed('constructorRef', 'constructor_ref')
+df = add_ingestion_date(df)
+df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
@@ -61,4 +79,12 @@ df = df.withColumnRenamed('constructorId', 'constructior_id') \
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'/mnt/{data_lake}/processed/constructors')
+df.write.mode('overwrite').parquet(f'{processed_folder_path}/constructors')
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+dbutils.notebook.exit('Success')

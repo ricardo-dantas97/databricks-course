@@ -9,12 +9,34 @@
 
 # COMMAND ----------
 
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType
-from pyspark.sql.functions import current_timestamp, col
+# MAGIC %md
+# MAGIC ##### Running other notebooks to reuse important variables and functions
 
 # COMMAND ----------
 
-storage_account_name = 'rddatabricks'
+# MAGIC %run "../utils/configs"
+
+# COMMAND ----------
+
+# MAGIC %run "../utils/common_functions"
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Creating parameter for data source column
+
+# COMMAND ----------
+
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+data_source = dbutils.widgets.get('p_data_source')
+
+# COMMAND ----------
+
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
@@ -37,7 +59,7 @@ df_schema = StructType(
 df = spark.read \
     .option('header', 'true') \
     .schema(df_schema) \
-    .csv(f'/mnt/{storage_account_name}/raw/circuits.csv')
+    .csv(f'{raw_folder_path}/circuits.csv')
 
 # COMMAND ----------
 
@@ -64,7 +86,8 @@ df = df.select(
 
 # COMMAND ----------
 
-df = df.withColumn("ingestion_date", current_timestamp())
+df = add_ingestion_date(df)
+df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
@@ -73,4 +96,12 @@ df = df.withColumn("ingestion_date", current_timestamp())
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f"/mnt/{storage_account_name}/processed/circuits")
+df.write.mode('overwrite').parquet(f"{processed_folder_path}/circuits")
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+dbutils.notebook.exit('Success')

@@ -10,11 +10,28 @@
 
 # COMMAND ----------
 
-data_lake = 'rddatabricks'
+# MAGIC %run "../utils/common_functions"
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp, col
+# MAGIC %run "../utils/configs"
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Creating parameter for data source column
+
+# COMMAND ----------
+
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+data_source = dbutils.widgets.get('p_data_source')
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 
 # COMMAND ----------
@@ -38,7 +55,7 @@ schema = StructType(
 df = spark.read \
     .schema(schema) \
     .option('multiLine', 'true') \
-    .json(f'/mnt/{data_lake}/raw/qualifying')
+    .json(f'{raw_folder_path}/qualifying')
 
 # COMMAND ----------
 
@@ -54,8 +71,9 @@ display(df)
 df = df.withColumnRenamed('qualifyId', 'qualify_id') \
        .withColumnRenamed('raceId', 'race_id') \
        .withColumnRenamed('driverId', 'driver_id') \
-       .withColumnRenamed('constructorId', 'constructor_id') \
-       .withColumn('ingestion_date', current_timestamp())
+       .withColumnRenamed('constructorId', 'constructor_id')
+df = add_ingestion_date(df)
+df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
@@ -64,4 +82,12 @@ df = df.withColumnRenamed('qualifyId', 'qualify_id') \
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'/mnt/{data_lake}/processed/qualifying')
+df.write.mode('overwrite').parquet(f'{processed_folder_path}/qualifying')
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+dbutils.notebook.exit('Success')

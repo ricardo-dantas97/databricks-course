@@ -9,12 +9,29 @@
 
 # COMMAND ----------
 
-data_lake = 'rddatabricks'
+# MAGIC %run "../utils/common_functions"
+
+# COMMAND ----------
+
+# MAGIC %run "../utils/configs"
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Creating parameter for data source column
+
+# COMMAND ----------
+
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+data_source = dbutils.widgets.get('p_data_source')
 
 # COMMAND ----------
 
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DateType
-from pyspark.sql.functions import current_timestamp, col, concat, lit
+from pyspark.sql.functions import col, concat, lit
 
 # COMMAND ----------
 
@@ -46,7 +63,7 @@ drivers_schema = StructType(
 
 df = spark.read \
     .schema(drivers_schema) \
-    .json(f'/mnt/{data_lake}/raw/drivers.json')
+    .json(f'{raw_folder_path}/drivers.json')
 
 # COMMAND ----------
 
@@ -57,8 +74,9 @@ df = spark.read \
 
 df = df.withColumnRenamed('driverId', 'driver_id') \
        .withColumnRenamed('driverRef', 'driver_ref') \
-       .withColumn('name', concat(col('name.forename'), lit(' '), col('name.surname'))) \
-       .withColumn('ingestion_date', current_timestamp())
+       .withColumn('name', concat(col('name.forename'), lit(' '), col('name.surname'))) 
+df = add_ingestion_date(df)
+df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
@@ -78,4 +96,12 @@ df = df.drop('url')
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'/mnt/{data_lake}/processed/drivers')
+df.write.mode('overwrite').parquet(f'{processed_folder_path}/drivers')
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+dbutils.notebook.exit('Success')

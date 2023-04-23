@@ -9,12 +9,29 @@
 
 # COMMAND ----------
 
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType
-from pyspark.sql.functions import current_timestamp, to_timestamp, col, lit, concat
+# MAGIC %run "../utils/configs"
 
 # COMMAND ----------
 
-storage_account_name = 'rddatabricks'
+# MAGIC %run "../utils/common_functions"
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Creating parameter for data source column
+
+# COMMAND ----------
+
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+data_source = dbutils.widgets.get('p_data_source')
+
+# COMMAND ----------
+
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+from pyspark.sql.functions import to_timestamp, col, lit, concat
 
 # COMMAND ----------
 
@@ -36,7 +53,7 @@ df_schema = StructType(
 df = spark.read \
     .option('header', 'true') \
     .schema(df_schema) \
-    .csv(f'/mnt/{storage_account_name}/raw/races.csv')
+    .csv(f'{raw_folder_path}/races.csv')
 
 # COMMAND ----------
 
@@ -45,8 +62,9 @@ df = spark.read \
 
 # COMMAND ----------
 
-df = df.withColumn('race_timestamp', to_timestamp(concat(col('date'), lit(' '), col('time')), 'yyyy-MM-dd HH:mm:ss')) \
-       .withColumn("ingestion_date", current_timestamp())
+df = df.withColumn('race_timestamp', to_timestamp(concat(col('date'), lit(' '), col('time')), 'yyyy-MM-dd HH:mm:ss'))
+df = add_ingestion_date(df)
+df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
@@ -72,4 +90,12 @@ df = df.select(
 
 # COMMAND ----------
 
-df.write.mode('overwrite').partitionBy('race_year').parquet(f"/mnt/{storage_account_name}/processed/races")
+df.write.mode('overwrite').partitionBy('race_year').parquet(f"{processed_folder_path}/races")
+
+# COMMAND ----------
+
+display(df)
+
+# COMMAND ----------
+
+dbutils.notebook.exit('Success')

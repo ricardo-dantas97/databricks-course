@@ -13,8 +13,36 @@ storage_account_name = 'rddatabricks'
 
 # COMMAND ----------
 
+# Widgets are ways to pass parameters to the notebook to make it dynamic
+dbutils.widgets.help()
+
+# COMMAND ----------
+
+# Creating a parameter with no value. It appears on the left top of the notebook
+dbutils.widgets.text('p_data_source', '')
+
+# COMMAND ----------
+
+# Getting the value of a parameter
+parameter = dbutils.widgets.get('p_data_source')
+print(parameter)
+
+# COMMAND ----------
+
+# MAGIC %run "../formula1-project/utils/common_functions"
+
+# COMMAND ----------
+
 # Creating df from a csv file using option like 'header'
 df = spark.read.option("header", "true").csv(f'/mnt/{storage_account_name}/raw/circuits.csv')
+
+# COMMAND ----------
+
+df = add_data_source(df, parameter)
+
+# COMMAND ----------
+
+df.show()
 
 # COMMAND ----------
 

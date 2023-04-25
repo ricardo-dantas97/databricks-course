@@ -67,7 +67,7 @@ df = df.drop('url')
 
 # COMMAND ----------
 
-df = df.withColumnRenamed('constructorId', 'constructior_id') \
+df = df.withColumnRenamed('constructorId', 'constructor_id') \
        .withColumnRenamed('constructorRef', 'constructor_ref')
 df = add_ingestion_date(df)
 df = add_data_source(df, data_source)

@@ -80,7 +80,8 @@ df = df.select(
     col("circuitId").alias("circuit_id"),
     col("name"),
     col("race_timestamp"),
-    col("ingestion_date")
+    col("ingestion_date"),
+    col("data_source")
 )
 
 # COMMAND ----------

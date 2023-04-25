@@ -38,10 +38,11 @@ df = results_df.join(df, results_df.race_id == df.race_id) \
                     results_df.fastest_lap,
                     results_df.time.alias('race_time'),
                     results_df.points,
+                    results_df.position,
                     drivers_df.name.alias('driver_name'),
                     drivers_df.number.alias('driver_number'),
                     drivers_df.nationality,
-                    constructors_df.constructor_ref.alias('team')
+                    constructors_df.name.alias('team')
                 )
 
 # COMMAND ----------

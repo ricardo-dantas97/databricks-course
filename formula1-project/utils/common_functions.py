@@ -9,3 +9,8 @@ def add_ingestion_date(df):
 def add_data_source(df, value):
     df = df.withColumn('data_source', lit(value))
     return df
+
+
+def add_created_date(df):
+    df = df.withColumn('created_date', current_timestamp())
+    return df

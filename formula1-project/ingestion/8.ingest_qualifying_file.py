@@ -82,7 +82,7 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{processed_folder_path}/qualifying')
+df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.qualifying")
 
 # COMMAND ----------
 

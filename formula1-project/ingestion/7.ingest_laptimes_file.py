@@ -72,7 +72,7 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{processed_folder_path}/lap_times')
+df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.lap_times")
 
 # COMMAND ----------
 

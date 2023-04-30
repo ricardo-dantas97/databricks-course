@@ -35,4 +35,4 @@ grouped_df = grouped_df.withColumn('rank', rank().over(driver_rank))
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{presentation_folder_path}/constructor_standings')
+df.write.mode('overwrite').format('parquet').saveAsTable('f1_presentation.constructor_standings')

@@ -35,4 +35,4 @@ df = df.withColumn('rank', rank().over(driver_rank))
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{presentation_folder_path}/driver_standings')
+df.write.mode('overwrite').format('parquet').saveAsTable('f1_presentation.driver_standings')

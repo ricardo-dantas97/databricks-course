@@ -51,4 +51,4 @@ df = add_created_date(df)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{presentation_folder_path}/race_results')
+df.write.mode('overwrite').format('parquet').saveAsTable('f1_presentation.race_results')

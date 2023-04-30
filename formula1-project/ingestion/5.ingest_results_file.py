@@ -97,7 +97,7 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').partitionBy('race_id').parquet(f'{processed_folder_path}/results')
+df.write.mode('overwrite').partitionBy('race_id').format('parquet').saveAsTable("f1_processed.results")
 
 # COMMAND ----------
 

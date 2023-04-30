@@ -91,7 +91,10 @@ df = df.select(
 
 # COMMAND ----------
 
-df.write.mode('overwrite').partitionBy('race_year').parquet(f"{processed_folder_path}/races")
+df.write.mode('overwrite') \
+    .format('parquet') \
+    .partitionBy('race_year') \
+    .saveAsTable("f1_processed.races")
 
 # COMMAND ----------
 

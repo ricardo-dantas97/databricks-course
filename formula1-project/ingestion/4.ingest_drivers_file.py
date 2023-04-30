@@ -96,7 +96,7 @@ df = df.drop('url')
 
 # COMMAND ----------
 
-df.write.mode('overwrite').parquet(f'{processed_folder_path}/drivers')
+df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.drivers")
 
 # COMMAND ----------
 

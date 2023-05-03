@@ -23,10 +23,12 @@
 # COMMAND ----------
 
 dbutils.widgets.text('p_data_source', '')
+data_source = dbutils.widgets.get('p_data_source')
 
 # COMMAND ----------
 
-data_source = dbutils.widgets.get('p_data_source')
+dbutils.widgets.text('p_file_date', '2021-03-21')
+file_date = dbutils.widgets.get('p_file_date')
 
 # COMMAND ----------
 
@@ -63,7 +65,7 @@ drivers_schema = StructType(
 
 df = spark.read \
     .schema(drivers_schema) \
-    .json(f'{raw_folder_path}/drivers.json')
+    .json(f'{raw_folder_path}/{file_date}/drivers.json')
 
 # COMMAND ----------
 
@@ -77,6 +79,7 @@ df = df.withColumnRenamed('driverId', 'driver_id') \
        .withColumn('name', concat(col('name.forename'), lit(' '), col('name.surname'))) 
 df = add_ingestion_date(df)
 df = add_data_source(df, data_source)
+df = add_file_date(df, file_date)
 
 # COMMAND ----------
 

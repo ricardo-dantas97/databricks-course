@@ -1,5 +1,5 @@
 # Databricks notebook source
-arguments = {"p_data_source":"Ergast API"}
+arguments = {"p_data_source":"Ergast API", "p_file_date":"2021-04-18"}
 
 # COMMAND ----------
 

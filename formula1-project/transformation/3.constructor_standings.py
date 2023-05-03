@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text('p_file_date', '')
+file_date = dbutils.widgets.get('p_file_date')
+
+# COMMAND ----------
+
 # MAGIC %run "../utils/common_functions"
 
 # COMMAND ----------
@@ -12,12 +17,22 @@
 
 # COMMAND ----------
 
-from pyspark.sql.functions import sum, count, when, desc, rank
+from pyspark.sql.functions import sum, count, when, desc, rank, col
 from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-df = spark.read.parquet(f'{presentation_folder_path}/race_results')
+race_results_list = spark.read.parquet(f'{presentation_folder_path}/race_results') \
+    .filter(f"result_file_date = '{file_date}'")
+
+# COMMAND ----------
+
+race_year_list = df_column_to_list(race_results_list, 'race_year')
+
+# COMMAND ----------
+
+df = spark.read.parquet(f'{presentation_folder_path}/race_results') \
+    .filter(col('race_year').isin(race_year_list))
 
 # COMMAND ----------
 
@@ -35,4 +50,4 @@ grouped_df = grouped_df.withColumn('rank', rank().over(driver_rank))
 
 # COMMAND ----------
 
-df.write.mode('overwrite').format('parquet').saveAsTable('f1_presentation.constructor_standings')
+overwrite_partition(df, 'f1_presentation', 'constructor_standings', 'race_year')

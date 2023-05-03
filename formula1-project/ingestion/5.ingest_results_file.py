@@ -23,10 +23,12 @@
 # COMMAND ----------
 
 dbutils.widgets.text('p_data_source', '')
+data_source = dbutils.widgets.get('p_data_source')
 
 # COMMAND ----------
 
-data_source = dbutils.widgets.get('p_data_source')
+dbutils.widgets.text('p_file_date', '')
+file_date = dbutils.widgets.get('p_file_date')
 
 # COMMAND ----------
 
@@ -59,7 +61,7 @@ schema = """
 
 df = spark.read \
     .schema(schema) \
-    .json(f'{raw_folder_path}/results.json')
+    .json(f'{raw_folder_path}/{file_date}/results.json')
 
 # COMMAND ----------
 
@@ -89,6 +91,7 @@ df = df.select(
 ) 
 df = add_ingestion_date(df)
 df = add_data_source(df, data_source)
+df = add_file_date(df, file_date)
 
 # COMMAND ----------
 
@@ -97,11 +100,30 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').partitionBy('race_id').format('parquet').saveAsTable("f1_processed.results")
+# MAGIC %md
+# MAGIC ##### Incremental load - Method 1
 
 # COMMAND ----------
 
-# df.write.mode('overwrite').parquet(f'{processed_folder_path}/results')
+# Collect method returns a list, so we can iterate over the values and drop the partitions that already exists
+
+# for race_id_list in df.select('race_id').distinct().collect():
+#     if (spark._jsparkSession.catalog().tableExists('f1_processed.results')):
+#         spark.sql(f"ALTER TABLE f1_processed.results DROP IF EXISTS PARTITION (race_id = {race_id_list.race_id})")
+
+# COMMAND ----------
+
+# df.write.mode('append').partitionBy('race_id').format('parquet').saveAsTable("f1_processed.results")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Incremental load - Method 2
+
+# COMMAND ----------
+
+# Let Spark overwrite the partitions that already exists
+df = overwrite_partition(df, 'f1_processed', 'results', 'race_id')
 
 # COMMAND ----------
 
@@ -110,3 +132,10 @@ display(df)
 # COMMAND ----------
 
 dbutils.notebook.exit('Success')
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT race_id, count(1)
+# MAGIC FROM f1_processed.results
+# MAGIC GROUP BY 1

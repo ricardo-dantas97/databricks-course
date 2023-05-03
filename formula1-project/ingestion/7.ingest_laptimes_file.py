@@ -24,10 +24,12 @@
 # COMMAND ----------
 
 dbutils.widgets.text('p_data_source', '')
+data_source = dbutils.widgets.get('p_data_source')
 
 # COMMAND ----------
 
-data_source = dbutils.widgets.get('p_data_source')
+dbutils.widgets.text('p_file_date', '')
+file_date = dbutils.widgets.get('p_file_date')
 
 # COMMAND ----------
 
@@ -51,7 +53,7 @@ schema = StructType(
 
 df = spark.read \
     .schema(schema) \
-    .csv(f'{raw_folder_path}/lap_times')
+    .csv(f'{raw_folder_path}/{file_date}/lap_times')
 
 # COMMAND ----------
 
@@ -72,7 +74,7 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.lap_times")
+df = overwrite_partition(df, 'f1_processed', 'lap_times', 'race_id')
 
 # COMMAND ----------
 

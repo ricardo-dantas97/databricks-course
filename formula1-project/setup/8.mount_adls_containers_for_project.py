@@ -54,4 +54,8 @@ create_mount_adls(storage_account_name, 'presentation')
 
 # COMMAND ----------
 
+create_mount_adls(storage_account_name, 'demo')
+
+# COMMAND ----------
+
 display(dbutils.fs.ls(f'/mnt/{storage_account_name}'))

@@ -95,13 +95,15 @@ df = df.select(
 # COMMAND ----------
 
 df.write.mode('overwrite') \
-    .format('parquet') \
+    .format('delta') \
     .partitionBy('race_year') \
     .saveAsTable("f1_processed.races")
 
 # COMMAND ----------
 
-display(df)
+# MAGIC %sql
+# MAGIC SELECT COUNT(*)
+# MAGIC FROM f1_processed.races
 
 # COMMAND ----------
 

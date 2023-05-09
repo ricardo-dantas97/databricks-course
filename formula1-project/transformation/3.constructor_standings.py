@@ -22,7 +22,7 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-race_results_list = spark.read.parquet(f'{presentation_folder_path}/race_results') \
+race_results_list = spark.read.format('delta').load(f'{presentation_folder_path}/race_results') \
     .filter(f"result_file_date = '{file_date}'")
 
 # COMMAND ----------
@@ -31,7 +31,7 @@ race_year_list = df_column_to_list(race_results_list, 'race_year')
 
 # COMMAND ----------
 
-df = spark.read.parquet(f'{presentation_folder_path}/race_results') \
+df = spark.read.format('delta').load(f'{presentation_folder_path}/race_results') \
     .filter(col('race_year').isin(race_year_list))
 
 # COMMAND ----------
@@ -50,4 +50,5 @@ grouped_df = grouped_df.withColumn('rank', rank().over(driver_rank))
 
 # COMMAND ----------
 
-overwrite_partition(df, 'f1_presentation', 'constructor_standings', 'race_year')
+merge_condition = 'target.race_year = source.race_year AND target.race_year = source.race_year'
+merge_delta_data(df, 'f1_presentation', 'constructor_standings', presentation_folder_path, merge_condition, 'race_year')

@@ -61,10 +61,6 @@ df = spark.read \
 
 # COMMAND ----------
 
-display(df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ##### Step 2 - Rename and select only needed columns and add ingestion date
 
@@ -84,11 +80,8 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df = overwrite_partition(df, 'f1_processed', 'qualifying', 'race_id')
-
-# COMMAND ----------
-
-display(df)
+merge_condition = "target.qualify_id = source.qualify_id"
+merge_delta_data(df, 'f1_processed', 'qualifying', processed_folder_path, merge_condition, 'race_id')
 
 # COMMAND ----------
 

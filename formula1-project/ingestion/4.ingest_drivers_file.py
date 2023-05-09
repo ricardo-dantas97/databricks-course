@@ -99,11 +99,13 @@ df = df.drop('url')
 
 # COMMAND ----------
 
-df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.drivers")
+df.write.mode('overwrite').format('delta').saveAsTable("f1_processed.drivers")
 
 # COMMAND ----------
 
-display(df)
+# MAGIC %sql
+# MAGIC SELECT COUNT(*)
+# MAGIC FROM f1_processed.drivers
 
 # COMMAND ----------
 

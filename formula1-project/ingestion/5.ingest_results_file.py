@@ -95,6 +95,11 @@ df = add_file_date(df, file_date)
 
 # COMMAND ----------
 
+# Dedup df
+df = df.dropDuplicates(['race_id', 'driver_id'])
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 3 - Write output to datalake partitioning by race id
 
@@ -123,19 +128,13 @@ df = add_file_date(df, file_date)
 # COMMAND ----------
 
 # Let Spark overwrite the partitions that already exists
-df = overwrite_partition(df, 'f1_processed', 'results', 'race_id')
+# df = overwrite_partition(df, 'f1_processed', 'results', 'race_id')
 
 # COMMAND ----------
 
-display(df)
+merge_condition = 'target.result_id = source.result_id AND target.race_id = source.race_id'
+merge_delta_data(df, 'f1_processed', 'results', processed_folder_path, merge_condition, 'race_id')
 
 # COMMAND ----------
 
 dbutils.notebook.exit('Success')
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT race_id, count(1)
-# MAGIC FROM f1_processed.results
-# MAGIC GROUP BY 1

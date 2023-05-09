@@ -82,11 +82,13 @@ df = add_file_date(df, file_date)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.constructors")
+df.write.mode('overwrite').format('delta').saveAsTable("f1_processed.constructors")
 
 # COMMAND ----------
 
-display(df)
+# MAGIC %sql
+# MAGIC SELECT COUNT(*)
+# MAGIC FROM f1_processed.constructors
 
 # COMMAND ----------
 

@@ -12,11 +12,11 @@ file_date = dbutils.widgets.get('p_file_date')
 
 # COMMAND ----------
 
-results_df = spark.read.parquet(f'{processed_folder_path}/results').filter(f"file_date = '{file_date}'")
-races_df = spark.read.parquet(f'{processed_folder_path}/races')
-circuits_df = spark.read.parquet(f'{processed_folder_path}/circuits')
-drivers_df = spark.read.parquet(f'{processed_folder_path}/drivers')
-constructors_df = spark.read.parquet(f'{processed_folder_path}/constructors')
+results_df = spark.read.format('delta').load(f'{processed_folder_path}/results').filter(f"file_date = '{file_date}'")
+races_df = spark.read.format('delta').load(f'{processed_folder_path}/races')
+circuits_df = spark.read.format('delta').load(f'{processed_folder_path}/circuits')
+drivers_df = spark.read.format('delta').load(f'{processed_folder_path}/drivers')
+constructors_df = spark.read.format('delta').load(f'{processed_folder_path}/constructors')
 
 # COMMAND ----------
 
@@ -58,4 +58,5 @@ df = add_created_date(df)
 
 # COMMAND ----------
 
-df = overwrite_partition(df, 'f1_presentation', 'race_results', 'result_race_id')
+merge_condition = 'target.race_id = source.race_id AND target.driver_name = source.driver_name'
+merge_delta_data(df, 'f1_presentation', 'race_results', presentation_folder_path, merge_condition, 'result_race_id')

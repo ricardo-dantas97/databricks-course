@@ -99,7 +99,13 @@ df = add_file_date(df, file_date)
 
 # COMMAND ----------
 
-df.write.mode('overwrite').format('parquet').saveAsTable("f1_processed.circuits")
+df.write.mode('overwrite').format('delta').saveAsTable("f1_processed.circuits")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT *
+# MAGIC FROM f1_processed.circuits
 
 # COMMAND ----------
 

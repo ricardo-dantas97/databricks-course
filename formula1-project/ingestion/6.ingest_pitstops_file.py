@@ -75,11 +75,12 @@ df = add_data_source(df, data_source)
 
 # COMMAND ----------
 
-df = overwrite_partition(df, 'f1_processed', 'pit_stops', 'race_id')
-
-# COMMAND ----------
-
-display(df)
+merge_condition = """
+    target.race_id = source.race_id 
+    AND target.driver_id = source.driver_id
+    AND target.stop = source.stop
+"""
+merge_delta_data(df, 'f1_processed', 'pit_stops', processed_folder_path, merge_condition, 'race_id')
 
 # COMMAND ----------
 
